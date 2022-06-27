@@ -7,7 +7,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
+
 using WalletConnectSharp.Unity;
+
+using MintNFTSDK.SingleMint;
+
 
 /// <summary>
 /// Demo script for uploading NFT to IPFS and Minting it in-game
@@ -27,22 +31,7 @@ public class SingleMint : MonoBehaviour
     public UnityEvent postMint;
     public UnityEvent mintFail;
 
-    // Upload preview and asset from Filesystem | Enable if using filesystem
-    //private string[] assetTypes = 
-    //    {"Image","JPG,PNG,JPEG,SVG", 
-    //    "Gif","GIF", 
-    //    "Video","MP4,WEBM", 
-    //    "Music","MP3,WAV", 
-    //    "3D Model","GLB,GLTF"}; 
-    //private string[] previewTypes = 
-    //    {"Image","JPG,PNG,JPEG,SVG"};
-
-    private string apiEndPoint = "https://mintnfttoday.herokuapp.com"; // API Endpoint
-    private string apiKey = "090c413d-ef55-4755-93c8-6b99151fc262"; // API key from website
-
-    // Store paths for preview and asset if uploading from Filesystem | Enable if using filesystem
-    //private string assetPath;
-    //private string previewPath;
+    private string apiKey = "ad072490-b517-4010-a052-377b88fa7188"; // API key from website
 
     private string mintData; // Stores stringified Json for Mint request body
 
@@ -57,28 +46,11 @@ public class SingleMint : MonoBehaviour
         formData = new List<IMultipartFormSection>(); // Initialize form data
     }
 
-    #region Choose file from System | Enable if using filesystem
-    //public void SelectAsset()
-    //{
-    //    assetPath = EditorUtility.OpenFilePanelWithFilters("Choose Asset", "", assetTypes);
-    //    Debug.Log(assetPath);
-    //    StartCoroutine(GetAssetFile());
-    //}
-
-    //public void SelectPreview()
-    //{
-    //    previewPath = EditorUtility.OpenFilePanelWithFilters("Choose Preview Image", "", previewTypes);
-    //    Debug.Log(previewPath);
-    //    StartCoroutine(GetPreviewFiles());
-    //}
-    #endregion
-
     // Starts the Upload to IPFS against the connected Wallet and the metadata
     public void UploadToIPFS()
     {
-        uploadRoot.wallet = WalletConnect.ActiveSession.Accounts[0];
-        uploadRoot.metadata.name = "WIN Badge";
-        uploadRoot.metadata.description = "Badge for winning this FPS level"; 
+        uploadRoot.name = "WIN Badge";
+        uploadRoot.description = "Badge for winning this FPS level"; 
 
         string data = JsonUtility.ToJson(uploadRoot);
 
@@ -92,19 +64,13 @@ public class SingleMint : MonoBehaviour
     {
         root.wallet = WalletConnect.ActiveSession.Accounts[0];
         root.type = "ERC721";
-        root.amount = "0";
-        root.network = "mumbai";
+        root.amount = 1;
+        root.network = "mainnet";
         root.tokenUri = ipfsRoot.data.url;
 
         mintData = JsonUtility.ToJson(root);
 
-        StartCoroutine(StartMint());
-    }
-
-    // Get all NFTs minted by this wallet through this platform
-    public void GetNFT()
-    {
-        StartCoroutine(GetMintedNFT());
+        StartMint();
     }
 
     // Load the preview image onto the form field
@@ -124,93 +90,53 @@ public class SingleMint : MonoBehaviour
         yield return loadAsset.SendWebRequest();
         formData.Add(new MultipartFormFileSection("asset", loadAsset.downloadHandler.data, Path.GetFileName($"{Application.streamingAssetsPath}/WinBadge.jpg"), "*/*"));
 
-        StartCoroutine(StartUpload());
+        StartUpload();
     }
 
     // Upload request to endpoint - IPFS Upload
-    private IEnumerator StartUpload()
+    private async void StartUpload()
     {
-        UnityWebRequest req = UnityWebRequest.Post($"{apiEndPoint}/v1/upload/single", formData);
+        string result = await MintNFT.Upload(apiKey, formData);
 
-        req.SetRequestHeader("x-api-key", apiKey);
-
-        yield return req.SendWebRequest();
-
-        if (req.result == UnityWebRequest.Result.Success)
+        if (result.Contains("ERROR"))
         {
-            Debug.Log(req.responseCode);
-            Debug.Log(req.downloadHandler.text);
+            Debug.LogError("Error in Uploading!");
+            Debug.Log(result);
+            uploadFail.Invoke();
 
-            string ipfsHash = req.downloadHandler.text;
+            formData.Clear();
+        }
+        else
+        {
+            Debug.Log(result);
 
-            ipfsRoot = JsonUtility.FromJson<IPFSRoot>(ipfsHash);
+            ipfsRoot = JsonUtility.FromJson<IPFSRoot>(result);
 
             postUpload.Invoke();
 
             Mint();
         }
-        else
-        {
-            Debug.LogError("Error in Uploading!");
-            Debug.Log(req.error);
-            Debug.Log(req.responseCode);
-
-            uploadFail.Invoke();
-
-            formData.Clear();
-        }
     }
 
     // Mint request to endpoint - Post upload success
-    private IEnumerator StartMint()
+    private async void StartMint()
     {
-        var uwr = new UnityWebRequest($"{apiEndPoint}/v1/mint/single", "POST");
-        byte[] jsonToSend = new System.Text.UTF8Encoding().GetBytes(mintData);
-        uwr.uploadHandler = (UploadHandler)new UploadHandlerRaw(jsonToSend);
-        uwr.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+        string result = await MintNFT.Mint(apiKey, mintData);
 
-        uwr.SetRequestHeader("x-api-key", apiKey);
-        uwr.SetRequestHeader("Content-Type", "application/json");
-
-        yield return uwr.SendWebRequest();
-
-        if (uwr.result == UnityWebRequest.Result.Success)
-        {
-            Debug.Log(uwr.responseCode);
-            Debug.Log(uwr.downloadHandler.text);
-
-            postMint.Invoke();
-        }
-        else
+        if (result.Contains("ERROR"))
         {
             Debug.LogError("Error in Minting!");
-            Debug.Log(uwr.error);
-            Debug.Log(uwr.responseCode);
+            Debug.Log(result);
 
             mintFail.Invoke();
 
             formData.Clear();
         }
-    }
-
-    // Get NFT request to endpoint - Post minting atleast one NFT from this platform
-    private IEnumerator GetMintedNFT()
-    {
-        UnityWebRequest req = UnityWebRequest.Get($"{apiEndPoint}/v1/nft/{WalletConnect.ActiveSession.Accounts[0]}");
-        req.SetRequestHeader("x-api-key", apiKey);
-
-        yield return req.SendWebRequest();
-
-        if (req.result == UnityWebRequest.Result.Success)
-        {
-            Debug.Log(req.responseCode);
-            Debug.Log(req.downloadHandler.text);
-        }
         else
         {
-            Debug.LogError("Error in getting NFTs!");
-            Debug.Log(req.error);
-            Debug.Log(req.responseCode);
+            Debug.Log(result);
+
+            postMint.Invoke();
         }
     }
 }
@@ -231,17 +157,10 @@ public class IPFSRoot
 }
 
 [Serializable]
-public class Metadata
+public class UploadRoot
 {
     public string name;
     public string description;
-}
-
-[Serializable]
-public class UploadRoot
-{
-    public string wallet;
-    public Metadata metadata;
 }
 
 [Serializable]
@@ -249,7 +168,7 @@ public class DataRoot
 {
     public string wallet;
     public string type;
-    public string amount;
+    public int amount;
     public string network;
     public string tokenUri;
 }

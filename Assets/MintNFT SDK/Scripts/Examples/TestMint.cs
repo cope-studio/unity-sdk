@@ -12,7 +12,7 @@ public class TestMint : MonoBehaviour
     public string wallet;
     [Tooltip("Type of NFT - ERC721 or ERC1155")]
     public string type;
-    [Tooltip("[OPTIONAL] 'soulbound' if you want it to be ECR721-Soulbound. Ignore for normal ERC721 and ERC1155")]
+    [Tooltip("'soulbound' if you want it to be ECR721-Soulbound. Leave empty for normal ERC721 and ERC1155")]
     public string tokenCategory;
     [Tooltip("Total supply for ERC1155. Default is 1 for ERC721")]
     public int amount = 1;
@@ -33,12 +33,13 @@ public class TestMint : MonoBehaviour
     {
         body.wallet = wallet;
         body.type = type;
-        //body.tokenCategory = tokenCategory; // [OPTIONAL - 'soulbound' if you want it to be ECR721-Soulbound. Ignore for ERC721 and ERC1155]
+        body.tokenCategory = tokenCategory; // ['soulbound' if you want it to be ECR721-Soulbound. Leave empty for normal ERC721 and ERC1155]
         body.amount = amount;
         body.network = network;
         body.tokenUri = tokenUri;
 
         bodyJson = JsonUtility.ToJson(body);
+        Debug.Log(bodyJson);
     }
 
     // Mint the NFT (async operation)

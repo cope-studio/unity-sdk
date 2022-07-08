@@ -64,6 +64,7 @@ public class SingleMint : MonoBehaviour
     {
         root.wallet = WalletConnect.ActiveSession.Accounts[0];
         root.type = "ERC721";
+        root.tokenCategory = null;
         root.amount = 1;
         root.network = "mainnet";
         root.tokenUri = ipfsRoot.data.url;
@@ -168,6 +169,7 @@ public class DataRoot
 {
     public string wallet;
     public string type;
+    public string tokenCategory;
     public int amount;
     public string network;
     public string tokenUri;

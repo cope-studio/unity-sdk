@@ -539,12 +539,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38b62073f4959bb46b78f3b1da53cd3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wallet: 0x80FB67Cf03190976bc2F5C2131A942cbdefFdBAc
+  wallet: 0x3866b6395884249d5a31B7bB8d93F47d68A76137
   type: ERC721
   tokenCategory: 
   amount: 1
   network: mainnet
-  tokenUri: ipfs://bafyreidcvole24dsvil5ake2kjs5xtnju6afhcgaa2dhgfkwwlu34k4gvy/metadata.json
+  tokenUri: ipfs://bafyreictifzmcjawcty62audcuwl7xcutm4463ewv7eylgqinucdgofffa/metadata.json
 --- !u!4 &1052346554
 Transform:
   m_ObjectHideFlags: 0

@@ -9,6 +9,7 @@ using UnityEditor;
 using UnityEngine.Networking;
 
 using MintNFTSDK.SingleMint;
+using SFB;
 
 /// <summary>
 /// Tests upload functionality
@@ -29,18 +30,20 @@ public class TestUpload : MonoBehaviour
     private static List<IMultipartFormSection> formData = new List<IMultipartFormSection>(); 
 
     // Upload preview and asset from Filesystem | Enable if using filesystem
-    private string[] assetTypes =
-        {"Image","JPG,PNG,JPEG,SVG",
-        "Gif","GIF",
-        "Video","MP4,WEBM",
-        "Music","MP3,WAV",
-        "3D Model","GLB,GLTF"};
-    private string[] previewTypes =
-        {"Image","JPG,PNG,JPEG,SVG"};
+    private ExtensionFilter[] assetExtensions = new[] {
+        new ExtensionFilter("Image Files", "png", "jpg", "jpeg", "svg" ),
+        new ExtensionFilter("Gif Files", "gif"),
+        new ExtensionFilter("Sound Files", "mp3", "wav" ),
+        new ExtensionFilter("Video Files", "mp4", "webm" ),
+        new ExtensionFilter("3D Files", "gltf", "glb" ),
+    };
+    private ExtensionFilter[] preivewExtensions = new[] {
+        new ExtensionFilter("Image Files", "png", "jpg", "jpeg", "svg" ),
+    };
 
     // Store paths for preview and asset if uploading from Filesystem | Enable if using filesystem
-    private string assetPath;
-    private string previewPath;
+    private string[] assetPath;
+    private string[] previewPath;
 
     // Web request initialization
     private UnityWebRequest loadPreview;
@@ -63,32 +66,33 @@ public class TestUpload : MonoBehaviour
     // Gets the file explorer to get preview file path
     public void SelectPreview()
     {
-        previewPath = EditorUtility.OpenFilePanelWithFilters("Choose Preview Image", "", previewTypes);
-        Debug.Log(previewPath);
+        previewPath = StandaloneFileBrowser.OpenFilePanel("Choose Preview Image", "", preivewExtensions, false);
+        Debug.Log(previewPath[0]);
         StartCoroutine(GetPreviewFiles());
     }
 
+    // Load the preview image onto the form field
     private IEnumerator GetPreviewFiles()
     {
-        loadPreview = UnityWebRequest.Get(previewPath);
+        loadPreview = UnityWebRequest.Get(previewPath[0]);
         yield return loadPreview.SendWebRequest();
-        formData.Add(new MultipartFormFileSection("image", loadPreview.downloadHandler.data, Path.GetFileName(previewPath), "image/*"));
+        formData.Add(new MultipartFormFileSection("image", loadPreview.downloadHandler.data, Path.GetFileName(previewPath[0]), "image/*"));
     }
 
     // Gets the file explorer to get asset file path
     public void SelectAsset()
     {
-        assetPath = EditorUtility.OpenFilePanelWithFilters("Choose Asset", "", assetTypes);
-        Debug.Log(assetPath);
+        assetPath = StandaloneFileBrowser.OpenFilePanel("Choose Asset", "", assetExtensions, false);
+        Debug.Log(assetPath[0]);
         StartCoroutine(GetAssetFile());
     }
 
     // Load the asset onto the form field
     private IEnumerator GetAssetFile()
     {
-        loadAsset = UnityWebRequest.Get(assetPath);
+        loadAsset = UnityWebRequest.Get(assetPath[0]);
         yield return loadAsset.SendWebRequest();
-        formData.Add(new MultipartFormFileSection("asset", loadAsset.downloadHandler.data, Path.GetFileName(assetPath), "*/*"));
+        formData.Add(new MultipartFormFileSection("asset", loadAsset.downloadHandler.data, Path.GetFileName(assetPath[0]), "*/*"));
     }
 
     // Upload the files (async operation)

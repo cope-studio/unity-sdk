@@ -25,7 +25,8 @@ public class TestUpload : MonoBehaviour
     public string nftDescription;
 
     // API Key from the platform
-    private string APIKEY = "ad072490-b517-4010-a052-377b88fa7188";
+    //private string APIKEY = "ad072490-b517-4010-a052-377b88fa7188";
+    private string APIKEY = "40a23090-1a26-4628-ac52-595c807a4476";
     // Holds form data for file upload
     private static List<IMultipartFormSection> formData = new List<IMultipartFormSection>(); 
 

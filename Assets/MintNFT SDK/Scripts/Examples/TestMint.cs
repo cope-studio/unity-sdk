@@ -22,7 +22,8 @@ public class TestMint : MonoBehaviour
     public string tokenUri;
 
     // API Key from the platform
-    private string APIKEY = "ad072490-b517-4010-a052-377b88fa7188";
+    //private string APIKEY = "ad072490-b517-4010-a052-377b88fa7188";
+    private string APIKEY = "40a23090-1a26-4628-ac52-595c807a4476";
 
     // Mint request body object
     private MintBody body = new MintBody();

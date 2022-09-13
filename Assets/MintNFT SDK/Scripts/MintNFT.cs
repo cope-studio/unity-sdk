@@ -11,7 +11,7 @@ namespace MintNFTSDK.SingleMint
     /// </summary>
     public class MintNFT
     {
-        private static string apiEndPoint = "https://api-staging.mintnft.today"; // API Endpoint
+        private static string apiEndPoint = "https://api.mintnft.today"; // API Endpoint
 
         /// <summary>
         /// Uploads the asset and preview file to IPFS

@@ -514,8 +514,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3639a64e3f26f8446992f0b5a48de562, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nftName: My Eye
-  nftDescription: This is my new eyes
+  nftName: 
+  nftDescription: 
 --- !u!4 &1038820797
 Transform:
   m_ObjectHideFlags: 0

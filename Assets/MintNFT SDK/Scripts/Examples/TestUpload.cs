@@ -25,8 +25,7 @@ public class TestUpload : MonoBehaviour
     public string nftDescription;
 
     // API Key from the platform
-    //private string APIKEY = "ad072490-b517-4010-a052-377b88fa7188";
-    private string APIKEY = "40a23090-1a26-4628-ac52-595c807a4476";
+    private string APIKEY = ""; // Add your API key here
     // Holds form data for file upload
     private static List<IMultipartFormSection> formData = new List<IMultipartFormSection>(); 
 
@@ -53,6 +52,12 @@ public class TestUpload : MonoBehaviour
     // Metadata Json object
     private MetadataData data = new MetadataData();
     private string metadataJson;
+
+    private void Awake()
+    {
+        if (APIKEY == "")
+            Debug.LogError("No API key provided! Please provide a valid API key.");
+    }
 
     private void Start()
     {

@@ -505,7 +505,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38b62073f4959bb46b78f3b1da53cd3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wallet: 0x80FB67Cf03190976bc2F5C2131A942cbdefFdBAc
+  wallet: 
   type: ERC721
   tokenCategory: 
   amount: 1

@@ -22,15 +22,20 @@ public class TestMint : MonoBehaviour
     public string tokenUri;
 
     // API Key from the platform
-    //private string APIKEY = "ad072490-b517-4010-a052-377b88fa7188";
-    private string APIKEY = "40a23090-1a26-4628-ac52-595c807a4476";
+    private string APIKEY = ""; // Add your API key here
 
     // Mint request body object
     private MintBody body = new MintBody();
     private string bodyJson;
 
+    private void Awake()
+    {
+        if (APIKEY == "")
+            Debug.LogError("No API key provided! Please provide a valid API key.");
+    }
+
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         body.wallet = wallet;
         body.type = type;
@@ -40,7 +45,15 @@ public class TestMint : MonoBehaviour
         body.tokenUri = tokenUri;
 
         bodyJson = JsonUtility.ToJson(body);
-        Debug.Log(bodyJson);
+
+        if (wallet == "")
+        {
+            Debug.LogError("No wallet address provided! Please provide a valid wallet address.");
+        }
+        else
+        {  
+            Debug.Log(bodyJson);
+        }
     }
 
     // Mint the NFT (async operation)

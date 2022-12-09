@@ -24,8 +24,10 @@ string result = MintNFT.RefreshJWT(string APIKEY, string REFRESH_TOKEN, string s
 ```
 
 To get the APIKEY, JWT and REFRESH_TOKEN a please go to API dashboard - https://app.0xmint.io/create/api
+
 To check the formats of the formdata, json body, etc. please check our documentation here - https://docs.0xmint.io/
 
 ## IMPORTANT
 In v2 of the APIs, creating a custom contract from the API dashboard is mandatory.
+
 WE ARE DEPRECATING V1 APIs AND SUGGEST THE USAGE OF ONLY V2 APIs!
